@@ -1,0 +1,33 @@
+AWSTemplateFormatVersion: 2010-09-09
+
+Description: AWS API Gateway Deployment - Reusable template to deploy a particular Rest API. 
+# Cloudformation reference of API Gateway Deployment resource: https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigateway-deployment.html
+
+Parameters:
+  AppName:
+    Description: Name of the application, to be referenced in tag.
+    Type: String
+  RestApiId:
+    Description: API Gateway Rest API ID.
+    Type: String
+  StageName:
+    Description: Stage name of deployment.
+    Type: String
+  DeploymentDescription: 
+    Description: Description of deployment stage. 
+    Type: String
+
+
+Resources:
+  APIGatewayDeployment:
+    Type: 'AWS::ApiGateway::Deployment'
+    Properties:
+      RestApiId: !Ref RestApiId
+      StageName: !Ref StageName
+      StageDescription: 
+        Tags: # Tags assigned to resource
+          - Key: solution_name
+            Value: !Ref AppName
+          - Key: provisioned_by
+            Value: cloudformation
+      Description: !Ref DeploymentDescription

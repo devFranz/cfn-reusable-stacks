@@ -1,0 +1,70 @@
+AWSTemplateFormatVersion: 2010-09-09
+
+Description: AWS API Gateway Method - Reusable template to create a method (GET|POST|DELETE etc) for the API Gateway Resource resource. 
+# Cloudformation reference of API Gateway Method resource: https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigateway-method.html
+
+Parameters:
+  RestApiId:
+    Description: API Gateway Rest API ID.
+    Type: String
+  ResourceId:
+    Description: Resource ID the method is attach to. 
+    Type: String
+  HttpMethod:
+    Description: Type of method used (GET|POST|DELETE, etc.).
+    Type: String
+  ApiGatewayRoleArn:
+    Description: IAM Role ARN to allow method to access specific resouces.
+    Type: String
+  Uri:
+    Description: URI of resource which is integrated with method.
+    Type: String
+  FeatureGroupPathParameter:
+    Description: (for get methods only) Set the partition key value 
+    Type: String
+    Default: no-value
+  RecordIdentifierRequestParameter:
+    Description: (for get methods only) Set the sort key value 
+    Type: String
+    Default: no-value
+
+Conditions:
+  IsGetMethod: !Equals [!Ref HttpMethod, GET]
+
+Resources:
+  APIGatewayMethod:
+    Type: AWS::ApiGateway::Method
+    Properties:
+      RestApiId: !Ref RestApiId # required
+      ResourceId: !Ref ResourceId # required
+      HttpMethod: !Ref HttpMethod # required
+      AuthorizationType: NONE # required
+      MethodResponses:
+        - StatusCode: 200
+      RequestParameters:
+        method.request.path.FeatureGroupPathParameter: !If [IsGetMethod , true, false]
+        method.request.querystring.RecordIdentifierRequestParameter: !If [IsGetMethod , true, false]
+      Integration:
+        !If
+          - IsGetMethod
+          - Type: AWS
+            Credentials: !Ref ApiGatewayRoleArn
+            IntegrationHttpMethod: Get
+            Uri: !Ref Uri
+            RequestParameters:
+              integration.request.path.FeatureGroupPathParameter: !Ref FeatureGroupPathParameter
+              integration.request.querystring.RecordIdentifierRequestParameter: !Ref RecordIdentifierRequestParameter
+            PassthroughBehavior: WHEN_NO_TEMPLATES
+            IntegrationResponses:
+              - StatusCode: 200
+          - Type: AWS
+            Credentials: !Ref ApiGatewayRoleArn
+            IntegrationHttpMethod: POST
+            Uri: !Ref Uri
+            PassthroughBehavior: WHEN_NO_TEMPLATES
+            IntegrationResponses:
+              - StatusCode: 200
+
+Outputs: # Resource outputs used in dependent resources
+  MethodId:
+    Value: !Ref APIGatewayMethod

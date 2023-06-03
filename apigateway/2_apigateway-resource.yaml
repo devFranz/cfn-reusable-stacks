@@ -1,0 +1,27 @@
+AWSTemplateFormatVersion: 2010-09-09
+
+Description: AWS API Gateway Resource - Reusable template to create a resource for the API Gateway resource. 
+# Cloudformation reference of API Gateway Resource resource: https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigateway-resource.html
+
+Parameters:
+  RestApiId:
+    Description: The ID of the RestApi resource in which you want to create this resource.
+    Type: String
+  ParentId:
+    Description: If you want to create a child resource, the ID of the parent resource.
+    Type: String
+  PathPart:
+    Description: A path name for the resource.
+    Type: String
+
+Resources:
+  ApiGatewayResource:
+    Type: AWS::ApiGateway::Resource
+    Properties:
+      ParentId: !Ref ParentId
+      RestApiId: !Ref RestApiId
+      PathPart: !Ref PathPart
+
+Outputs: # Resource outputs used in dependent resources
+  ResourceId:
+    Value: !GetAtt ApiGatewayResource.ResourceId

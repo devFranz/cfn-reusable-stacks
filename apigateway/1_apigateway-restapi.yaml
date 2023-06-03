@@ -1,0 +1,36 @@
+AWSTemplateFormatVersion: 2010-09-09
+
+Description: AWS API Gateway Rest API - Root resource for the Gateway API resource.
+# Cloudformation reference of API Gateway RestAPI resource: https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigateway-restapi.html
+
+Parameters:
+  AppName:
+    Description: Name of the application, to be referenced in Rest API name.
+    Type: String
+  ServiceIntegration:
+    Description: Name of the service the API is integrated with.
+    Type: String
+  EndpointType: 
+    Description: Endpoint regional configuration type (Edge, regional or private).
+    Type: String
+
+
+Resources:
+  RestApiId:
+    Type: AWS::ApiGateway::RestApi
+    Properties:
+      Name: !Sub ${AppName}-${ServiceIntegration}-restapi
+      Tags: # Tags assigned to resource
+        - Key: solution_name
+          Value: !Ref AppName
+        - Key: provisioned_by
+          Value: cloudformation
+      EndpointConfiguration:
+        Types: 
+         - !Ref EndpointType
+    
+Outputs: # Resource outputs used in dependent resources
+  RestApiId:
+    Value: !Ref RestApiId
+  RootResourceId:
+    Value: !GetAtt RestApiId.RootResourceId

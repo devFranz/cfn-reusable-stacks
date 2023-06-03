@@ -1,0 +1,69 @@
+AWSTemplateFormatVersion: 2010-09-09
+
+Description: Provision DynamoDB Table for the application. Table only uses one attribute for schema definition. This can be changed as per requirement.
+# Cloudformation reference of DynamoDB Table resource: https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-dynamodb-table.html
+
+Parameters:
+  AppName:
+    Description: Name of the application, to be referenced in table name and tag.
+    Type: String
+  TblName:
+    Description: Name of the DynamoDB table.
+    Type: String
+  PartitionKeyDefinitionName:
+    Description: Name of partition key.
+    Type: String
+  PartitionKeyDefinitionType:
+    Description: Data type of partition key. (e.g. S).
+    Type: String
+  PartitionKeySchemaType:
+    Description: Schema key type of partition key (e.g. HASH).
+    Type: String
+  SortKeyDefinitionName:
+    Description: Name of sort key.
+    Type: String
+  SortKeyDefinitionType:
+    Description: Data type of sort key. (e.g. S).
+    Type: String
+  SortKeySchemaType:
+    Description: Schema key type of sort key (e.g. RANGE).
+    Type: String
+  ReadCapacityUnits:
+    Description: Read throughput capacity allowed for the table (e.g. 5).
+    Type: String
+  WriteCapacityUnits:
+    Description: Write throughput capacity allowed for the table (e.g. 5).
+    Type: String
+
+Resources: 
+  DynamoDBTable: 
+    Type: AWS::DynamoDB::Table
+    Properties: 
+      TableName: !Join
+        - '_'
+        - - !Ref TblName
+          - 'table'
+      AttributeDefinitions: # A list of attributes that describe the key schema for the table and indexes
+        - AttributeName: !Ref PartitionKeyDefinitionName
+          AttributeType: !Ref PartitionKeyDefinitionType
+        - AttributeName: !Ref SortKeyDefinitionName
+          AttributeType: !Ref SortKeyDefinitionType
+      KeySchema: # Specifies the attributes that make up the primary key for the table. The attributes in the KeySchema property must also be defined in the AttributeDefinitions property
+        - AttributeName: !Ref PartitionKeyDefinitionName
+          KeyType: !Ref PartitionKeySchemaType
+        - AttributeName: !Ref SortKeyDefinitionName
+          KeyType: !Ref SortKeySchemaType
+      ProvisionedThroughput: # Throughput for the specified table, which consists of values for ReadCapacityUnits and WriteCapacityUnits
+        ReadCapacityUnits: !Ref ReadCapacityUnits
+        WriteCapacityUnits: !Ref WriteCapacityUnits
+      Tags: # Tags assigned to resource
+        - Key: solution_name
+          Value: !Ref AppName
+        - Key: provisioned_by
+          Value: cloudformation
+
+Outputs: # Resource outputs used in dependent resources
+  DynamoDBTableName:
+    Value: !Ref DynamoDBTable
+  DynamoDBTableArn:
+    Value: !GetAtt DynamoDBTable.Arn

@@ -1,0 +1,61 @@
+AWSTemplateFormatVersion: 2010-09-09
+
+Description: Create an Identity and Access Management service role used to allow a service resource permissions. 
+# Cloudformation reference of IAM Role resource: https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-iam-role.html
+
+Parameters:
+  AppName:
+    Description: Name of the application, to be referenced in role name.
+    Type: String
+  AssumingService: 
+    Description: Name of the service assuming role.
+    Type: String 
+  AllowedService: 
+    Description: Name of the service allowed access.
+    Type: String 
+  PolicyActions:
+    Description: List of allowed actions to be performed by API Gateway.
+    Type: String
+  ResourceArn:
+    Description: Resource arn used in policy statement to allows API Gateway Resource access to resource.
+    Type: String
+
+Resources:  
+  IamRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Join
+        - '_'
+        - - !Ref AppName
+          - 'service-role'
+          - !Ref AssumingService
+          - 'allows'
+          - !Ref AllowedService
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Action:
+              - 'sts:AssumeRole'
+            Effect: Allow
+            Principal:
+              Service:
+                - !Sub ${AssumingService}.amazonaws.com
+      Policies:
+        - PolicyName: ApiGatewayPolicy
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Action: !Split 
+                  - ","
+                  - !Ref PolicyActions
+                Resource: !Sub '${ResourceArn}*'
+      Tags: # Tags assigned to resource
+        - Key: solution_name
+          Value: !Ref AppName
+        - Key: provisioned_by
+          Value: cloudformation
+
+Outputs: # Resource outputs used in dependent resources
+  IamRoleArn:
+    Value: !GetAtt IamRole.Arn

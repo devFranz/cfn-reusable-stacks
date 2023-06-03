@@ -1,0 +1,53 @@
+AWSTemplateFormatVersion: 2010-09-09
+
+Description: Create a lambda function. 
+# Cloudformation reference of Lambda functions resource: https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-function.html
+
+Parameters:
+  AppName:
+    Description: Name of the application, to be referenced in role name.
+    Type: String
+  
+  LambdaExecutionRole:
+    Description: LambdaExecutionRole.
+    Type: String
+
+Resources:
+  LambdaFunction:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName:  !Join
+        - '_'
+        - - !Ref AppName
+          - 'lambda-function'
+          - 'textract'
+      Code:
+        ZipFile: |
+          import boto3
+
+          def lambda_handler(event, context):
+              # Set up AWS credentials
+              aws_access_key_id = 'your_access_key_id'
+              aws_secret_access_key = 'your_secret_access_key'
+              region_name = 'your_region_name'
+
+              # Set up Textract client
+              textract = boto3.client('textract', aws_access_key_id=aws_access_key_id,
+                                      aws_secret_access_key=aws_secret_access_key, region_name=region_name)
+
+              # Load up the file
+              file_data = event['file']
+
+              # Call Textract to extract text from the file
+              response = textract.detect_document_text(Document={'Bytes': file_data})
+
+              # Return the extracted text as the Lambda function's output
+              return response['Blocks']
+      Handler: index.lambda_handler
+      Role: !Ref LambdaExecutionRole
+      Runtime: python3.8
+      Timeout: 60
+
+Outputs: # Resource outputs used in dependent resources
+  LambdaFunctionArn:
+    Value: !GetAtt LambdaFunction.Arn

@@ -1,0 +1,21 @@
+AWSTemplateFormatVersion: 2010-09-09
+
+Description: AWS Feature Store - Create feature group.
+# Cloudformation reference of SageMaker FeatureStore resource: https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-sagemaker-featuregroup.html
+
+Resources:
+  MyFeatureGroup:
+    Type: AWS::SageMaker::FeatureGroup
+    Properties:
+      EventTimeFeatureName: my-event-time
+      FeatureDefinitions:
+        - FeatureName: my-feature-1
+          FeatureType: Fractional
+        - FeatureName: my-feature-2
+          FeatureType: Integral
+        - FeatureName: my-feature-3
+          FeatureType: String
+      FeatureGroupName: my-feature-group
+      OnlineStoreConfig:
+        EnableOnlineStore: true
+      RecordIdentifierFeatureName: my-record-id

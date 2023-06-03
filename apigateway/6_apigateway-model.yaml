@@ -1,0 +1,24 @@
+AWSTemplateFormatVersion: 2010-09-09
+
+Description: AWS API Gateway model - Reusable template to add models for schemas and template mappings. 
+# Cloudformation reference of API Gateway model resource: https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigateway-model.html
+
+Parameters:
+  RestApiId:
+    Description: API Gateway Rest API ID.
+    Type: String
+  ModelName: 
+    Description: Name of model. 
+    Type: String
+  ModelDescription: 
+    Description: Description of model. 
+    Type: String
+
+Resources:
+  APIGatewayModel:
+    Type: 'AWS::ApiGateway::Model'
+    Properties:
+      RestApiId: !Ref RestApiId
+      ContentType: application/json
+      Description: !Ref ModelDescription
+      Name: !Ref ModelName

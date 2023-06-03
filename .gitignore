@@ -1,0 +1,19 @@
+
+# Ignore api gateway request/response examples
+apigateway_request_templates/*.json
+apigateway_request_templates/*.txt
+apigateway_response_templates/*.json
+apigateway_response_templates/*.txt
+
+# Ignore api gateway request/response examples
+apigateway_data_model_schemas/*.json
+
+# Ignore api gateway test data samples
+test_data_samples/*.json
+test_data_samples/*.txt
+
+# General 
+LICENSE
+demo/*
+*root*
+static_stacks/*yaml
