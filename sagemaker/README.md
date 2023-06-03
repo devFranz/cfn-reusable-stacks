@@ -4,4 +4,4 @@ tags: []
 
 ---
 
-# SageMaker FeatureStore stacks
+# SageMaker Sagemaker stacks

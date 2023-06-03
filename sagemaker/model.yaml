@@ -1,0 +1,9 @@
+Resources:
+  MyModel:
+    Type: AWS::SageMaker::Model
+    Properties:
+      ModelName: my-model
+      PrimaryContainer:
+        Image: my-image:latest
+        ModelDataUrl: s3://my-bucket/my-model.tar.gz
+      ExecutionRoleArn: arn:aws:iam::123456789012:role/my-role

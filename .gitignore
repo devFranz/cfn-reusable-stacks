@@ -17,3 +17,4 @@ LICENSE
 demo/*
 *root*
 static_stacks/*yaml
+*.sh
